@@ -43,11 +43,13 @@ public class CityWeatherActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         cityWeatherInfoRecycler.setLayoutManager(new LinearLayoutManager(this));
         myAdapter=new MyAdapter(this);
+        progressBar.setVisibility(View.GONE);
 
         api= Get_Retrofit.getRetrofit().create(mWeatherApiInterface.class);
         okbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressBar.setVisibility(View.VISIBLE);
                 entertxt=cityedt.getText().toString();
                 Log.i("CityWeatherActivuty","Enter name : "+entertxt);
 
@@ -95,6 +97,7 @@ public class CityWeatherActivity extends AppCompatActivity {
 
 
                 } else {
+                    cityWeatherInfoRecycler.setVisibility(View.GONE);
                     Log.e("CityWeatherActivuty", "not success");
                     Toast.makeText(CityWeatherActivity.this, "City not found", Toast.LENGTH_SHORT).show();
                 }
