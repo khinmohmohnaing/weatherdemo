@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.dell.weather_forcest.R;
@@ -31,6 +32,7 @@ public class CityWeatherActivity extends AppCompatActivity {
     @BindView(R.id.cityWeatherInfoRecycler)RecyclerView cityWeatherInfoRecycler;
     @BindView(R.id.linear)LinearLayout linearLayout;
     @BindView(R.id.progressbar)ProgressBar progressBar;
+    @BindView(R.id.notfoundtxt)TextView notfoundtxt;
     mWeatherApiInterface api;
     MyAdapter myAdapter;
     String entertxt;
@@ -54,7 +56,6 @@ public class CityWeatherActivity extends AppCompatActivity {
                 Log.i("CityWeatherActivuty","Enter name : "+entertxt);
 
                 if(MainActivity.checkconnection(getApplicationContext())){
-                    progressBar.setVisibility(View.GONE);
                     callCityWeatherInfo();
                 }
                 else{
@@ -80,15 +81,18 @@ public class CityWeatherActivity extends AppCompatActivity {
                         }
                     }
                 });
+        snackbar.show();
     }
 
     public void callCityWeatherInfo(){
+        progressBar.setVisibility(View.GONE);
         Call<root> weatherinfo = api.getcityweatherinfo(entertxt);
         weatherinfo.enqueue(new Callback<root>() {
             @Override
             public void onResponse(Call<root> call, Response<root> response) {
                 if (response.isSuccessful()) {
-
+                    cityWeatherInfoRecycler.setVisibility(View.VISIBLE);
+                    notfoundtxt.setVisibility(View.GONE);
                     Log.i("CityWeatherActivuty", response.body().getList().size() + " "+
                             response.body().getMessage());
                     myAdapter.addList(response.body());
@@ -97,9 +101,9 @@ public class CityWeatherActivity extends AppCompatActivity {
 
 
                 } else {
-                    cityWeatherInfoRecycler.setVisibility(View.GONE);
                     Log.e("CityWeatherActivuty", "not success");
-                    Toast.makeText(CityWeatherActivity.this, "City not found", Toast.LENGTH_SHORT).show();
+                    cityWeatherInfoRecycler.setVisibility(View.GONE);
+                    notfoundtxt.setVisibility(View.VISIBLE);
                 }
             }
 
