@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
         api = Get_Retrofit.getRetrofit().create(mWeatherApiInterface.class);
         adapter = new MyAdapter(this);
         if(checkconnection(this)){
-            progressBar.setVisibility(View.GONE);
             callweatherInfo();
         }
         else {
@@ -80,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void callweatherInfo(){
 
+        progressBar.setVisibility(View.GONE);
         Call<root> information = api.getweatherinfo(16.871311, 96.199379);
         information.enqueue(new Callback<root>() {
             @Override
