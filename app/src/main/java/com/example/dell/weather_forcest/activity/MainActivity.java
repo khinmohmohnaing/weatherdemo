@@ -2,6 +2,7 @@ package com.example.dell.weather_forcest.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.icu.text.UnicodeSetSpanner;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.design.widget.Snackbar;
@@ -18,10 +19,12 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 
+import com.example.List;
 import com.example.dell.weather_forcest.R;
 import com.example.dell.weather_forcest.adapter.MyAdapter;
 import com.example.dell.weather_forcest.api.Get_Retrofit;
 import com.example.dell.weather_forcest.api.mWeatherApiInterface;
+import com.example.dell.weather_forcest.base.BaseVH;
 import com.example.dell.weather_forcest.model.root;
 
 import butterknife.BindView;
@@ -31,12 +34,13 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements BaseVH.onclick{
 
     @BindView(R.id.weather_recycler)RecyclerView weather_recycler;
     @BindView(R.id.relativelayout)RelativeLayout relativelayout;
     @BindView(R.id.progress)ProgressBar progressBar;
     @BindView(R.id.cityweatherbtn)Button cityweatherbtn;
+    Context context;
 
     mWeatherApiInterface api;
     MyAdapter adapter;
@@ -89,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
                     adapter.addList(response.body());
                     weather_recycler.setAdapter(adapter);
                     adapter.notifyDataSetChanged();
+                    adapter.setOnClick(MainActivity.this);
                 } else Log.e("MainActivity", "not success");
             }
 
@@ -117,4 +122,23 @@ public class MainActivity extends AppCompatActivity {
         snackbar.show();
     }
 
+
+    @Override
+    public void onItemClick(int position) {
+        Toast.makeText(getApplicationContext(),"this is "+position +" click",Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onGoDetailClick(List list) {
+        Intent intent=new Intent(getApplicationContext(), DetailActivity.class);
+        intent.putExtra("weather",list.getWeather().get(0).getDescription());
+        intent.putExtra("clouds",list.getClouds().getAll().toString());
+        intent.putExtra("wind",list.getWind().getSpeed().toString());
+        intent.putExtra("date",list.getDtTxt().toString());
+        intent.putExtra("image","http://api.openweathermap.org/img/w/"+
+                list.getWeather().get(0).getIcon());
+        MainActivity.this.startActivity(intent);
+    }
+
 }
+

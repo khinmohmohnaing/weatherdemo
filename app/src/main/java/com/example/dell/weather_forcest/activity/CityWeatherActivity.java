@@ -1,5 +1,7 @@
 package com.example.dell.weather_forcest.activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,10 +16,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.List;
 import com.example.dell.weather_forcest.R;
 import com.example.dell.weather_forcest.adapter.MyAdapter;
 import com.example.dell.weather_forcest.api.Get_Retrofit;
 import com.example.dell.weather_forcest.api.mWeatherApiInterface;
+import com.example.dell.weather_forcest.base.BaseVH;
 import com.example.dell.weather_forcest.model.root;
 
 import butterknife.BindView;
@@ -26,7 +30,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CityWeatherActivity extends AppCompatActivity {
+public class CityWeatherActivity extends AppCompatActivity implements BaseVH.onclick{
     @BindView(R.id.cityedt)EditText cityedt;
     @BindView(R.id.okbtn)Button okbtn;
     @BindView(R.id.cityWeatherInfoRecycler)RecyclerView cityWeatherInfoRecycler;
@@ -38,6 +42,7 @@ public class CityWeatherActivity extends AppCompatActivity {
     String entertxt;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +51,7 @@ public class CityWeatherActivity extends AppCompatActivity {
         cityWeatherInfoRecycler.setLayoutManager(new LinearLayoutManager(this));
         myAdapter=new MyAdapter(this);
         progressBar.setVisibility(View.GONE);
+
 
         api= Get_Retrofit.getRetrofit().create(mWeatherApiInterface.class);
         okbtn.setOnClickListener(new View.OnClickListener() {
@@ -59,7 +65,7 @@ public class CityWeatherActivity extends AppCompatActivity {
                     callCityWeatherInfo();
                 }
                 else{
-                   callInfoFail();
+                    callInfoFail();
                 }
 
 
@@ -98,6 +104,7 @@ public class CityWeatherActivity extends AppCompatActivity {
                     myAdapter.addList(response.body());
                     cityWeatherInfoRecycler.setAdapter(myAdapter);
                     myAdapter.notifyDataSetChanged();
+                    myAdapter.setOnClick(CityWeatherActivity.this);
 
 
                 } else {
@@ -114,5 +121,22 @@ public class CityWeatherActivity extends AppCompatActivity {
             }
 
         });
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        Toast.makeText(getApplicationContext(),"this is "+position +" click",Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onGoDetailClick(List list) {
+        Intent intent=new Intent(getApplicationContext(), DetailActivity.class);
+        intent.putExtra("weather",list.getWeather().get(0).getDescription());
+        intent.putExtra("clouds",list.getClouds().getAll().toString());
+        intent.putExtra("wind",list.getWind().getSpeed().toString());
+        intent.putExtra("date",list.getDtTxt().toString());
+        intent.putExtra("image","http://api.openweathermap.org/img/w/"+
+                list.getWeather().get(0).getIcon());
+        CityWeatherActivity.this.startActivity(intent);
     }
 }
